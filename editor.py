@@ -4,7 +4,7 @@ import tkinter
 import os
 
 path = None
-#Pycharm自己的from...import..，老王没瞎搞哈
+# Pycharm自己的from...import..，老王没瞎搞哦
 from tkinter import END
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 
