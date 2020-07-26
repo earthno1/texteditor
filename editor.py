@@ -78,7 +78,6 @@ def info():
     showinfo('关于', '此程序由 创新者.老王 与 渣渣_努力自闭ing 亲手打造')
 
 
-# op = Frame()
 def quitexit():
     sys.exit()
     quit()
@@ -141,7 +140,7 @@ def bigwmain():
     editor["height"] = main.winfo_height()
     main.update()
 
-
+# op = Frame()
 # newf = Button(master=op,text = "新建",command = new_file)
 # openf = Button(master=op,text = "打开文件",command = open_file)
 # saveasf = Button(master=op,text = "另存为",command = save_as_file)
