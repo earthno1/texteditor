@@ -84,15 +84,43 @@ def quitexit():
     quit()
 
 
+def cut(event=None):
+    editor.event_generate("<<Cut>>")
+
+
+def copy(event=None):
+    editor.event_generate("<<Copy>>")
+
+
+def paste(event=None):
+    editor.event_generate('<<Paste>>')
+
+
+# 右键菜单
+right_click_menu = Menu(main, tearoff=0)
+right_click_menu.add_command(label="剪切", command=cut)
+right_click_menu.add_command(label="复制", command=copy)
+right_click_menu.add_command(label="粘贴", command=paste)
+
+
+def right_click(event):
+    right_click_menu.post(event.x_root, event.y_root)
+
+
+main.bind("<Button-3>", right_click)
+
 menu = Menu(main)
 file = Menu(menu, tearoff=0)
 file.add_command(label="新建", command=new_file)
 file.add_command(label="打开", command=open_file)
 file.add_command(label="保存", command=save_file)
 file.add_command(label="另存为", command=save_as_file)
-
+edit = Menu(menu, tearoff=0)
+edit.add_command(label="剪切", command=cut)
+edit.add_command(label="复制", command=copy)
+edit.add_command(label="粘贴", command=paste)
 menu.add_cascade(label="文件", menu=file)
-menu.add_cascade(label="编辑")
+menu.add_cascade(label="编辑", menu=edit)
 menu.add_cascade(label="格式")
 menu.add_cascade(label="查看")
 
@@ -127,6 +155,7 @@ editor = Text()
 editor.pack(side=LEFT, expand=1)
 # editor.bind('<KeyPress>',func=bigwmain)
 main.config(menu=menu)
+
 # timer = threading.Timer(1, fresher)
 # timer.start()
 bigwmain()
