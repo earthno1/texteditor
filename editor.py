@@ -1,6 +1,5 @@
 '''pyinstaller Editor.py --add-data="./源码.ico;." -F -w -i 源码.ico'''
-import os
-import sys
+import os, sys
 from tkinter import *
 from tkinter.filedialog import asksaveasfilename, askopenfilename
 from tkinter.messagebox import showinfo
