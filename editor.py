@@ -31,6 +31,8 @@ window.bind("<Button-3>",c)
 
 
 #窗体控件
+
+
 t1=tkinter.Text()
 t1.pack()
 
