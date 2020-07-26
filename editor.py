@@ -6,7 +6,7 @@ from tkinter.messagebox import showinfo
 
 main = Tk()
 path = None
-main.title("创新者.编辑器 - 新的文本文件")
+main.title("文本编辑器 - 新的文本文件")
 main.geometry("500x500")
 zhidinv = False
 
@@ -37,9 +37,9 @@ def zhidin():
 
 def open_file():
     global path
-    path = askopenfilename(title="创新者.编辑器 - 打开", filetypes=[("文本文件", "*.txt"), ("所有文件", "*.*")])
+    path = askopenfilename(title="文本编辑器 - 打开", filetypes=[("文本文件", "*.txt"), ("所有文件", "*.*")])
     if path and path != "":
-        main.title("创新者.编辑器 - " + path)
+        main.title("文本编辑器 - " + path)
         editor.delete("1.0", END)
         with open(path, "r", encoding="utf-8") as f:
             editor.insert(END, f.read())
@@ -47,9 +47,9 @@ def open_file():
 
 def save_as_file():
     global path
-    path = asksaveasfilename(title="创新者.编辑器 - 另存为", filetypes=[("文本文件", "*.txt"), ("所有文件", "*.*")])
+    path = asksaveasfilename(title="文本编辑器 - 另存为", filetypes=[("文本文件", "*.txt"), ("所有文件", "*.*")])
     if path and path != "":
-        main.title("创新者.编辑器 - " + path)
+        main.title("文本编辑器 - " + path)
         with open(path, "w", encoding="utf-8") as f:
             f.write(editor.get("1.0", END))
 
@@ -60,9 +60,9 @@ def save_file():
         with open(path, "w", encoding="utf-8") as f:
             f.write(editor.get("1.0", END))
     elif path is None:
-        path = asksaveasfilename(title="创新者.编辑器 - 保存", filetypes=[("文本文件", "*.txt"), ("所有文件", "*.*")])
+        path = asksaveasfilename(title="文本编辑器 - 保存", filetypes=[("文本文件", "*.txt"), ("所有文件", "*.*")])
         if path and path != "":
-            main.title("创新者.编辑器 - " + path)
+            main.title("文本编辑器 - " + path)
             with open(path, "w", encoding="utf-8") as f:
                 f.write(editor.get("1.0", END))
 
@@ -70,12 +70,12 @@ def save_file():
 def new_file():
     global path
     path = None
-    main.title("创新者.编辑器 - 新的文本文件")
+    main.title("文本编辑器 - 新的文本文件")
     editor.delete("1.0", END)
 
 
 def info():
-    showinfo('关于', '此程序由创新者.老王亲手打造，只为装逼2333')
+    showinfo('关于', '此程序由 创新者.老王 与 渣渣_努力自闭ing 亲手打造')
 
 
 # op = Frame()
