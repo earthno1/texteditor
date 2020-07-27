@@ -35,7 +35,7 @@ def zhidin():
         zhidinv = True
 
 
-def open_file():
+def open_file(_=None):
     global path
     path = askopenfilename(title="文本编辑器 - 打开", filetypes=[("文本文件", "*.txt"), ("所有文件", "*.*")])
     if path and path != "":
@@ -45,7 +45,7 @@ def open_file():
             editor.insert(END, f.read())
 
 
-def save_as_file():
+def save_as_file(_=None):
     global path
     path = asksaveasfilename(title="文本编辑器 - 另存为", filetypes=[("文本文件", "*.txt"), ("所有文件", "*.*")])
     if path and path != "":
@@ -54,12 +54,12 @@ def save_as_file():
             f.write(editor.get("1.0", END))
 
 
-def save_file():
+def save_file(_=None):
     global path
     if path and path != "":
         with open(path, "w", encoding="utf-8") as f:
             f.write(editor.get("1.0", END))
-    elif path is None:
+    else:
         path = asksaveasfilename(title="文本编辑器 - 保存", filetypes=[("文本文件", "*.txt"), ("所有文件", "*.*")])
         if path and path != "":
             main.title("文本编辑器 - " + path)
@@ -67,7 +67,7 @@ def save_file():
                 f.write(editor.get("1.0", END))
 
 
-def new_file():
+def new_file(_=None):
     global path
     path = None
     main.title("文本编辑器 - 新的文本文件")
@@ -106,18 +106,19 @@ def right_click(event):
     right_click_menu.post(event.x_root, event.y_root)
 
 
-main.bind("<Button-3>", right_click)
+main.bind_all("<Button-3>", right_click)
 
 menu = Menu(main)
 file = Menu(menu, tearoff=0)
-file.add_command(label="新建", command=new_file)
-file.add_command(label="打开", command=open_file)
-file.add_command(label="保存", command=save_file)
-file.add_command(label="另存为", command=save_as_file)
+file.add_command(label="新建 ctrl+n", command=new_file)
+file.add_command(label="打开 ctrl+o", command=open_file)
+file.add_command(label="保存 ctrl+s", command=save_file)
+file.add_command(label="另存为 ctrl+shift+s", command=save_as_file)
 edit = Menu(menu, tearoff=0)
-edit.add_command(label="剪切", command=cut)
-edit.add_command(label="复制", command=copy)
-edit.add_command(label="粘贴", command=paste)
+edit.add_command(label="剪切 ctrl+x", command=cut)
+edit.add_command(label="复制 ctrl+c", command=copy)
+edit.add_command(label="粘贴 ctrl+v", command=paste)
+
 menu.add_cascade(label="文件", menu=file)
 menu.add_cascade(label="编辑", menu=edit)
 menu.add_cascade(label="格式")
@@ -154,7 +155,11 @@ editor = Text()
 editor.pack(side=LEFT, expand=1)
 # editor.bind('<KeyPress>',func=bigwmain)
 main.config(menu=menu)
-
+main.bind_all("<Control-s>", save_file)
+main.bind_all("<Control-Shift_L><Key-S>", save_as_file)
+main.bind_all("<Control-Shift_R><Key-S>", save_as_file)
+main.bind_all("<Control-n>", new_file)
+main.bind_all("<Control-o>", open_file)
 # timer = threading.Timer(1, fresher)
 # timer.start()
 bigwmain()
