@@ -1,8 +1,11 @@
 '''pyinstaller Editor.py --add-data="./源码.ico;." -F -w -i 源码.ico'''
 import os, sys
+from tkinter.filedialog import *
+from tkinter.messagebox import *
+from tkinter.simpledialog import *
 from tkinter import *
-from tkinter.filedialog import asksaveasfilename, askopenfilename
-from tkinter.messagebox import showinfo
+
+from tkinter.ttk import *
 
 main = Tk()
 path = None
@@ -92,11 +95,16 @@ def copy(event=None):
 
 
 def paste(event=None):
-    editor.event_generate('<<Paste>>')
+    editor.event_generate("<<Paste>>")
+
+
+def choose_all(event=None):
+    editor.event_generate("<<SelectAll>>")
 
 
 # 右键菜单
 right_click_menu = Menu(main, tearoff=0)
+right_click_menu.add_command(label="全选", command=choose_all)
 right_click_menu.add_command(label="剪切", command=cut)
 right_click_menu.add_command(label="复制", command=copy)
 right_click_menu.add_command(label="粘贴", command=paste)
@@ -104,6 +112,14 @@ right_click_menu.add_command(label="粘贴", command=paste)
 
 def right_click(event):
     right_click_menu.post(event.x_root, event.y_root)
+
+
+def replace_all(_=None):
+    from_str = askstring("替换", "替换什么文本？")
+    to_str = askstring("替换", "替换什么文本？")
+    tmp = editor.get("1.0", END)
+    editor.delete("1.0", END)
+    editor.insert("1.0", tmp.replace(from_str, to_str))
 
 
 main.bind_all("<Button-3>", right_click)
@@ -115,9 +131,11 @@ file.add_command(label="打开 ctrl+o", command=open_file)
 file.add_command(label="保存 ctrl+s", command=save_file)
 file.add_command(label="另存为 ctrl+shift+s", command=save_as_file)
 edit = Menu(menu, tearoff=0)
+edit.add_command(label="全选 ctrl+a", command=choose_all)
 edit.add_command(label="剪切 ctrl+x", command=cut)
 edit.add_command(label="复制 ctrl+c", command=copy)
 edit.add_command(label="粘贴 ctrl+v", command=paste)
+edit.add_command(label="替换 ctrl+r", command=replace_all)
 
 menu.add_cascade(label="文件", menu=file)
 menu.add_cascade(label="编辑", menu=edit)
@@ -160,6 +178,7 @@ main.bind_all("<Control-Shift_L><Key-S>", save_as_file)
 main.bind_all("<Control-Shift_R><Key-S>", save_as_file)
 main.bind_all("<Control-n>", new_file)
 main.bind_all("<Control-o>", open_file)
+main.bind_all("<Control-r>", replace_all)
 # timer = threading.Timer(1, fresher)
 # timer.start()
 bigwmain()
