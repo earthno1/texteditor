@@ -1,18 +1,70 @@
 '''pyinstaller Editor.py --add-data="./源码.ico;." -F -w -i 源码.ico'''
 import os
+import platform
 import sys
 from tkinter.filedialog import *
 from tkinter.messagebox import *
-from tkinter.simpledialog import *
+# from tkinter.simpledialog import *
 from tkinter import *
 
-from tkinter.ttk import *
+# import easygui
+
+# from tkinter.ttk import *
+if platform.system() == 'Windows':
+    from tkinter.ttk import *
+
+
+# 查找功能的窗口
+def find_window(event=None):
+    sw = Toplevel(main)
+    sw.title('查找')
+    sw.transient(main)
+    sw.resizable(False, False)
+    Label(sw, text="查找的文本:").grid(row=0, column=0)
+    e = Entry(sw, width=50)
+    e.grid(row=0, column=1)
+    e.focus_set()
+    Button(sw, text="全部查找", command=lambda: find_text(e.get(), ignore_case_value.get(), sw)).grid(row=0, column=2,
+                                                                                                  sticky='e' + 'w',
+                                                                                                  padx=2, pady=2)
+    ignore_case_value = IntVar()
+    Checkbutton(sw, text='不区分大小写', variable=ignore_case_value).grid(row=1, column=1, sticky='e', padx=2, pady=2)
+
+    def on_closing():
+        editor.tag_remove('match', '1.0', END)
+        editor.tag_add('match', "1.0", END)
+        editor.tag_config('match', foreground='black', background='white')
+        sw.destroy()
+
+    sw.protocol("WM_DELETE_WINDOW", on_closing)
+
+
+# 光标框选查找的内容
+
+def find_text(text, case, sw):
+    editor.tag_remove('match', '1.0', END)
+    num = 0
+    if text:
+        start_pos = '1.0'
+        while True:
+            start_pos = editor.search(text, start_pos, nocase=case, stopindex=END)
+            if not start_pos:
+                break
+            end_pos = '{}+{}c'.format(start_pos, len(text))
+            editor.tag_add('match', start_pos, end_pos)
+            start_pos = end_pos
+            num = num + 1
+        editor.tag_config('match', foreground='red', background='yellow')
+        sw.title('找到了' + str(num) + '个“' + text + '”')
+
 
 main = Tk()
 path = None
 main.title("文本编辑器 - 新的文本文件")
 main.geometry("500x500")
 zhidinv = False
+line_number_bar = Text(main, width=4, padx=3, takefocus=0, border=0, background='khaki', state='disabled', wrap='none')
+line_number_bar.pack(side='left', fill='y')
 
 
 def resource_path(relative_path):
@@ -87,6 +139,14 @@ def quitexit():
     quit()
 
 
+def redo(_=None):
+    editor.event_generate("<<Redo>>")
+
+
+def undo(_=None):
+    editor.event_generate("<<Undo>>")
+
+
 def cut(event=None):
     editor.event_generate("<<Cut>>")
 
@@ -109,15 +169,43 @@ right_click_menu.add_command(label="全选", command=choose_all)
 right_click_menu.add_command(label="剪切", command=cut)
 right_click_menu.add_command(label="复制", command=copy)
 right_click_menu.add_command(label="粘贴", command=paste)
+right_click_menu.add_command(label='撤销', command=undo)
+right_click_menu.add_command(label='恢复', command=redo)
 
 
 def right_click(event):
     right_click_menu.post(event.x_root, event.y_root)
 
 
-def replace_all(_=None):
-    from_str = askstring("替换", "替换什么文本？")
-    to_str = askstring("替换", "替换什么文本？")
+def replace_window(_=None):
+    rw = Toplevel(main)
+    rw.title("替换")
+    ff = Frame(rw)
+    tf = Frame(rw)
+    f = Entry(ff)
+    t = Entry(tf)
+    Label(ff, text="从文本：").pack(side=LEFT)
+    Label(tf, text="替换为：").pack(side=LEFT)
+    f.pack(side=LEFT)
+    t.pack(side=LEFT)
+    ff.pack()
+    tf.pack()
+    rf = Frame(rw)
+    Button(master=rf, text="替换全部", command=lambda: replace_all(f, t)).pack(side=LEFT)
+    Button(master=rf, text="替换", command=lambda: replace_one(f, t)).pack(side=LEFT)
+    rf.pack()
+
+
+def replace_one(f, t):
+    from_str, to_str = f.get(), t.get()
+    start_pos = editor.search(from_str, "1.0")
+    if start_pos != "":
+        end_pos = '{}+{}c'.format(start_pos, len(from_str))
+        editor.replace(start_pos, end_pos, to_str)
+
+
+def replace_all(f, t):
+    from_str, to_str = f.get(), t.get()
     tmp = editor.get("1.0", END)
     editor.delete("1.0", END)
     editor.insert("1.0", tmp.replace(from_str, to_str))
@@ -131,12 +219,17 @@ file.add_command(label="新建 ctrl+n", command=new_file)
 file.add_command(label="打开 ctrl+o", command=open_file)
 file.add_command(label="保存 ctrl+s", command=save_file)
 file.add_command(label="另存为 ctrl+shift+s", command=save_as_file)
+
 edit = Menu(menu, tearoff=0)
+edit.add_command(label='撤销 ctrl+z', command=undo)
+edit.add_command(label='恢复 ctrl+y', command=redo)
+edit.add_separator()
 edit.add_command(label="全选 ctrl+a", command=choose_all)
 edit.add_command(label="剪切 ctrl+x", command=cut)
 edit.add_command(label="复制 ctrl+c", command=copy)
 edit.add_command(label="粘贴 ctrl+v", command=paste)
-edit.add_command(label="替换 ctrl+r", command=replace_all)
+edit.add_command(label="查找 ctrl+f", command=find_window)
+edit.add_command(label="替换 ctrl+r", command=replace_window)
 
 menu.add_cascade(label="文件", menu=file)
 menu.add_cascade(label="编辑", menu=edit)
@@ -160,6 +253,7 @@ def bigwmain():
     editor["height"] = main.winfo_height()
     main.update()
 
+
 # op = Frame()
 # newf = Button(master=op,text = "新建",command = new_file)
 # openf = Button(master=op,text = "打开文件",command = open_file)
@@ -169,7 +263,7 @@ def bigwmain():
 # openf.pack()
 # saveasf.pack()
 # savef.pack()
-editor = Text()
+editor = Text(undo=True)
 # op.pack(side = LEFT)
 editor.pack(side=LEFT, expand=1)
 # editor.bind('<KeyPress>',func=bigwmain)
@@ -179,7 +273,8 @@ main.bind_all("<Control-Shift_L><Key-S>", save_as_file)
 main.bind_all("<Control-Shift_R><Key-S>", save_as_file)
 main.bind_all("<Control-n>", new_file)
 main.bind_all("<Control-o>", open_file)
-main.bind_all("<Control-r>", replace_all)
+main.bind_all("<Control-r>", replace_window)
+main.bind_all("<Control-f>", find_window)
 # timer = threading.Timer(1, fresher)
 # timer.start()
 bigwmain()
