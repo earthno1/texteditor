@@ -1,15 +1,18 @@
 '''pyinstaller Editor.py --add-data="./源码.ico;." -F -w -i 源码.ico'''
 import os
 import platform
+import string
 import sys
 from tkinter.filedialog import *
 from tkinter.messagebox import *
 # from tkinter.simpledialog import *
 from tkinter import *
-
+import webbrowser
 # import easygui
 
 # from tkinter.ttk import *
+from urllib.parse import quote
+
 if platform.system() == 'Windows':
     from tkinter.ttk import *
 
@@ -163,6 +166,55 @@ def choose_all(event=None):
     editor.event_generate("<<SelectAll>>")
 
 
+def search(_=None):
+    # print(editor.selection_get())
+    search_res(editor.selection_get())
+
+
+def search_res(words, s="Baidu"):
+    if s == 'Baidu':
+        url = 'https://www.baidu.com/s?ie=UTF-8&wd='
+    if s == 'Google':
+        url = 'https://www.google.com/search?newwindow=1&safe=active&sxsrf=ALeKk01Rbl78lS2qKRulGUqbsPsvAwyrmw' \
+              '%3A1594884595904&source=hp&ei=8wEQX4voNMu3ggejsJKIDQ&q='
+    if s == 'Bing(China)' or s == 'Bing(International)':
+        url = 'https://cn.bing.com/search?q='
+    if s == 'Baidubaike':
+        url = 'https://baike.baidu.com/search?word='
+    if s == 'Wikipedia':
+        url = 'https://wikipedia.org/w/index.php?search='
+    if s == 'DuckDuckGo':
+        url = 'https://duckduckgo.com/?q='
+    if s == 'Youtube':
+        url = 'https://www.youtube.com/results?search_query='
+    if s == 'Facebook':
+        url = 'https://www.facebook.com/search/top/?q='
+    if s == 'Weibo':
+        url = 'https://s.weibo.com/weibo?q='
+    if s == 'CSDN':
+        url = 'https://so.csdn.net/so/search/s.do?q='
+    if s == 'Amazon':
+        url = 'https://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords='
+    if s == 'Taobao':
+        url = 'https://s.taobao.com/search?q='
+
+    for w in words:
+        url += w
+        if len(words) > 1:
+            url += '+'
+    if s == 'Google':
+        url += '&gs_lcp' \
+               '=CgZwc3ktYWIQAzIHCCMQ6gIQJzIHCCMQ6gIQJzIHCCMQ6gIQJzIHCCMQ6gIQJzIHCCMQ6gIQJzIHCCMQ6gIQJzI' \
+               'HCCMQ6gIQJzIHCCMQ6gIQJzIHCCMQ6gIQJzIHCCMQ6gIQJ1DLBlihEmDtE2gBcAB4AIABAIgBAJIBAJgBAKABAao' \
+               'BB2d3cy13aXqwAQo&sclient=psy-ab&ved=0ahUKEwjLra2OoNHqAhXLm-AKHSOYBNEQ4dUDCAk&uact=5'
+    if s == 'Bing(China)':
+        url += '&FORM=BESBTB&ensearch=0'
+    if s == 'Bing(International)':
+        url += '&FORM=BESBTB&ensearch=1'
+    web = quote(url, safe=string.printable)
+    webbrowser.open_new(web)
+
+
 # 右键菜单
 right_click_menu = Menu(main, tearoff=0)
 right_click_menu.add_command(label="全选", command=choose_all)
@@ -171,11 +223,11 @@ right_click_menu.add_command(label="复制", command=copy)
 right_click_menu.add_command(label="粘贴", command=paste)
 right_click_menu.add_command(label='撤销', command=undo)
 right_click_menu.add_command(label='恢复', command=redo)
+right_click_menu.add_command(label='搜索', command=search)
 
 
 def right_click(event):
     right_click_menu.post(event.x_root, event.y_root)
-
 
 def replace_window(_=None):
     rw = Toplevel(main)
